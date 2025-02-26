@@ -13,4 +13,4 @@ cd ..
 source ./.env/pytorch/bin/activate
 
 # Install the requirements from requirements.txt
-pip install -r ../requirements.txt
+pip install -r ../requirement.txt

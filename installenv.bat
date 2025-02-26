@@ -20,7 +20,7 @@ REM Activate the virtual environment
 call .env\pytorch\Scripts\activate
 
 REM Install the required packages
-pip install -r requirements.txt
+pip install -r requirement.txt
 
 REM Deactivate the virtual environment
 deactivate
