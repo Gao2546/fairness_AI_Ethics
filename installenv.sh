@@ -7,8 +7,10 @@ cd .env
 # Create a Python virtual environment named pytorch
 python3 -m venv pytorch
 
+cd ..
+
 # Activate the virtual environment
-source pytorch/bin/activate
+source ./env/pytorch/bin/activate
 
 # Install the requirements from requirements.txt
 pip install -r ../requirements.txt
