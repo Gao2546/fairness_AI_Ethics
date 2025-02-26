@@ -2,7 +2,7 @@
 You can find the dataset [here](https://www.kaggle.com/datasets/ziya07/diabetes-clinical-dataset100k-rows).
 ## Setting Up Virtual Environment
 
-1. Run the script to create a virtual environment:
+1. Run the script to create a virtual environment (recommended Python version 3.11):
     - Windows: `installenv.bat`
     - Linux: `installenv.sh`
 2. Open VS Code and press the shortcut `Ctrl + Shift + P`.
