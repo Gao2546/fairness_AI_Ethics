@@ -6,11 +6,18 @@ IF %ERRORLEVEL% NEQ 0 (
     exit /b 1
 )
 
-REM Create virtual environment named .env
-python -m venv .env
+REM Create folder .env and change directory into it
+mkdir .env
+cd .env
+
+REM Create virtual environment named pytorch
+python -m venv pytorch
+
+REM Change back to the original directory
+cd ..
 
 REM Activate the virtual environment
-call .env\Scripts\activate
+call .env\pytorch\Scripts\activate
 
 REM Install the required packages
 pip install -r requirements.txt

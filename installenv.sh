@@ -1,10 +1,14 @@
 #!/bin/bash
 
-# Create a Python virtual environment named .env
-python3 -m venv .env
+# Create a directory named .env and change into it
+mkdir -p .env
+cd .env
+
+# Create a Python virtual environment named pytorch
+python3 -m venv pytorch
 
 # Activate the virtual environment
-source .env/bin/activate
+source pytorch/bin/activate
 
 # Install the requirements from requirements.txt
-pip install -r requirements.txt
+pip install -r ../requirements.txt
