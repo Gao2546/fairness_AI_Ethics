@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Create a directory named .env and change into it
-mkdir -p .env
-cd .env
+mkdir -p env
+cd env
 
 # Create a Python virtual environment named pytorch
 python3 -m venv pytorch
