@@ -7,4 +7,7 @@ scipy
 six
 stack-data
 sympy
-torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+torch
+torchvision
+torchaudio
+--extra-index-url https://download.pytorch.org/whl/cu118
