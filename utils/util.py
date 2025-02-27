@@ -6,6 +6,8 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 from sklearn.model_selection import train_test_split
 
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
 class Loader:
     def __init__(self, data_dir):
         self.data_dir = data_dir
@@ -55,10 +57,10 @@ class DataSet:
         self.X = data.drop(columns=['diabetes'])
         self.y = data['diabetes']
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.y, test_size=0.2, random_state=42)
-        self.X_train_tensor = torch.tensor(self.X_train.values, dtype=torch.float32, device=0)
-        self.y_train_tensor = torch.tensor(self.y_train.values, dtype=torch.float32, device=0).unsqueeze(1)
-        self.X_test_tensor = torch.tensor(self.X_test.values, dtype=torch.float32, device=0)
-        self.y_test_tensor = torch.tensor(self.y_test.values, dtype=torch.float32, device=0).unsqueeze(1)
+        self.X_train_tensor = torch.tensor(self.X_train.values, dtype=torch.float32, device=device)
+        self.y_train_tensor = torch.tensor(self.y_train.values, dtype=torch.float32, device=device).unsqueeze(1)
+        self.X_test_tensor = torch.tensor(self.X_test.values, dtype=torch.float32, device=device)
+        self.y_test_tensor = torch.tensor(self.y_test.values, dtype=torch.float32, device=device).unsqueeze(1)
         # One-hot encode the target variable using PyTorch
         self.y_train_onehot = torch.nn.functional.one_hot(self.y_train_tensor.to(torch.int64), num_classes=2).squeeze(1)
         self.y_test_onehot = torch.nn.functional.one_hot(self.y_test_tensor.to(torch.int64), num_classes=2).squeeze(1)
