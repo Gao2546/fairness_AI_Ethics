@@ -53,9 +53,9 @@ class NeuralNetwork(nn.Module):
         return x
 
 class DataSet:
-    def __init__(self, data):
-        self.X = data.drop(columns=['diabetes'])
-        self.y = data['diabetes']
+    def __init__(self, data, y_col):
+        self.X = data.drop(columns=[y_col])
+        self.y = data[y_col]
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.y, test_size=0.2, random_state=42)
         self.X_train_tensor = torch.tensor(self.X_train.values, dtype=torch.float32, device=device)
         self.y_train_tensor = torch.tensor(self.y_train.values, dtype=torch.float32, device=device).unsqueeze(1)
