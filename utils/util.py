@@ -3,7 +3,7 @@ import pandas as pd
 import torch.nn as nn
 from sklearn.preprocessing import OneHotEncoder
 import torch
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset, DataLoader, TensorDataset, WeightedRandomSampler
 from sklearn.model_selection import train_test_split
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -31,24 +31,28 @@ class Loader:
         return pd.read_json(file_path)
 
 class NeuralNetwork(nn.Module):
-    def __init__(self, d, input, output):
+    def __init__(self, d, input, output, drop):
         super(NeuralNetwork, self).__init__()
-        self.layer1 = nn.Linear(input, 128//d)
-        self.layer2 = nn.Linear(128//d, 128*2//d)
-        self.layer3 = nn.Linear(128*2//d, 128//d)
-        # self.layer4 = nn.Linear(128, 128)
-        # self.layer5 = nn.Linear(128, 128)
-        self.output = nn.Linear(128//d, output)
+        self.layer1 = nn.Linear(input, d)
+        self.layer2 = nn.Linear(d, d*2)
+        self.layer3 = nn.Linear(d*2, d*4)
+        self.layer4 = nn.Linear(d*4, d*2)
+        self.layer5 = nn.Linear(d*2, d)
+        self.output = nn.Linear(d, output)
         self.relu = nn.ReLU()
-        self.normalization = nn.BatchNorm1d(128//d)
+        self.dropout = nn.Dropout(p=drop)
+        self.normalization1 = nn.BatchNorm1d(d)
+        self.normalization0 = nn.BatchNorm1d(input)
+        self.normalization2 = nn.BatchNorm1d(d*2)
+        self.normalization3 = nn.BatchNorm1d(d*4)
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
-        x = self.relu(self.normalization(self.layer1(x)))
-        x = self.relu(self.layer2(x))
-        x = self.relu(self.layer3(x))
-        # x = self.relu(self.layer4(x))
-        # x = self.relu(self.layer5(x))
+        x = self.relu(self.normalization1(self.layer1(self.normalization0(x))))
+        x = self.relu((self.layer2(x)))
+        x = self.dropout(self.relu(self.normalization3(self.layer3(x))))
+        x = self.relu((self.layer4(x)))
+        x = self.relu(self.normalization1(self.layer5(x)))
         x = self.sigmoid(self.output(x))
         return x
 
@@ -68,7 +72,19 @@ class DataSet:
         self.train_dataset = DiabetesDataset(self.X_train_tensor, self.y_train_onehot)
         self.test_dataset = DiabetesDataset(self.X_test_tensor, self.y_test_onehot)
     def get_dataloaders(self, batch_size=64):
-        train_loader = DataLoader(self.train_dataset, batch_size=batch_size, shuffle=True)
+        # Compute class counts
+        class_counts = torch.bincount(self.y_train_tensor.to(torch.int64).flatten())
+        # class_counts[1] = class_counts[1] // 2  # Increase the number of samples for class 1
+        total_samples = int(sum(class_counts)) #len(self.y_train_tensor.to(torch.int64).flatten())
+
+        # Compute weights for each class (inverse of frequency)
+        class_weights = 1.0 / class_counts.float()
+        sample_weights = class_weights[self.y_train_tensor.to(torch.int64).flatten()]  # Assign weight to each sample
+
+        # Create Weighted Sampler
+        sampler = WeightedRandomSampler(weights=sample_weights, num_samples=total_samples, replacement=True)
+
+        train_loader = DataLoader(self.train_dataset, batch_size=batch_size, shuffle=False, sampler=sampler)
         test_loader = DataLoader(self.test_dataset, batch_size=batch_size, shuffle=False)
         return train_loader, test_loader
     
